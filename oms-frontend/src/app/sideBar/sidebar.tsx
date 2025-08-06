@@ -26,7 +26,7 @@ export default function SideBar() {
                     <ListItem
                         component={Link}
                         key={text}
-                        href={text === 'Order' ? '/order-form' : '/'}
+                        href={text === 'Order' ? '/orders' : '/'}
                         disablePadding
                     >
                         <ListItemButton>
