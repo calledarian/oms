@@ -1,27 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Products } from './products.entity';
+import { Product } from './products.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ProductsService {
     constructor(
-        @InjectRepository(Products)
-        private productsRepository: Repository<Products>,
+        @InjectRepository(Product)
+        private productsRepository: Repository<Product>,
     ) { }
 
-    findAll(): Promise<Products[]> {
+    findAll(): Promise<Product[]> {
         return this.productsRepository.find();
     }
 
-    findOne(id: number): Promise<Products | null> {
+    findOne(id: number): Promise<Product | null> {
         if (!id) {
             throw new Error('Missing id');
         }
         return this.productsRepository.findOneBy({ id });
     }
 
-    async create(data: Partial<Products>): Promise<Products> {
+    async create(data: Partial<Product>): Promise<Product> {
         if (!data.name || !data.description || !data.price) {
             throw new Error('Missing required fields: name, description, price');
         }
