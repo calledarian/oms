@@ -1,30 +1,10 @@
-'use client';
+'use client'
+import OrdersTable from "./_partials/OrdersTable";
 
-import React from 'react';
-import Box from '@mui/material/Box';
-import { DataGrid } from '@mui/x-data-grid';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { useOrders } from '../hooks/orderHooks/order';
-import { columns } from '../utility/gridColDef';
-
-const theme = createTheme();
-
-export default function OrdersTable() {
-    const { rows, loading, error } = useOrders();
-
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error.message}</div>;
-
+export default function Orders() {
     return (
-        <ThemeProvider theme={theme}>
-            <Box sx={{ width: '80vw' }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    getRowId={(row) => row.id}
-                    initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-                />
-            </Box>
-        </ThemeProvider>
+        <div>
+            <OrdersTable />
+        </div>
     );
 }

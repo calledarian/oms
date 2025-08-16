@@ -15,6 +15,7 @@
     "@mui/material": "^7.2.0",
     "@mui/x-data-grid": "^8.9.2",
     "axios": "^1.11.0",
+    "glightbox": "^3.3.1",
     "next": "15.4.5",
     "react": "19.1.0",
     "react-dom": "19.1.0"
