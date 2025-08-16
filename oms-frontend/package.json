@@ -12,7 +12,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.2.0",
-    "@mui/material": "^7.2.0",
+    "@mui/material": "^5.18.0",
     "@mui/x-data-grid": "^8.9.2",
     "axios": "^1.11.0",
     "glightbox": "^3.3.1",
@@ -23,12 +23,12 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
+    "@types/node": "24.3.0",
+    "@types/react": "19.1.10",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "5.9.2"
   }
 }

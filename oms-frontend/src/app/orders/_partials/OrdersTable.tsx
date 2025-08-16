@@ -4,7 +4,7 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { useOrders } from '@/app/hooks/orderHooks/order';
+import { useOrders } from '@/app/hooks/orderHooks/useOrder';
 import { columns } from '@/app/utility/gridColDef';
 
 const theme = createTheme();

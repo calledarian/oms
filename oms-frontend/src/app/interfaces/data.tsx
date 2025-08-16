@@ -7,6 +7,8 @@ export interface OrderRow {
     orderItems: OrderItem[];
     totalAmount: string;
     status: OrderStatus;
+    address: string;
+    phone: string;
     createdAt: string;
 }
 
@@ -14,7 +16,7 @@ export interface Product {
     id: number;
     name: string;
     description: string;
-    price: string;
+    price: number;
     images: string[];
     createdAt: string;
 }
@@ -22,15 +24,6 @@ export interface Product {
 export interface OrderItem {
     id: number;
     quantity: number;
-    price: string;
+    price: number;
     product: Product;
-}
-
-export interface DataGridDemoProps {
-    rows?: OrderRow[];
-}
-
-export interface GridCellExpandProps {
-    value: string;
-    width: number;
 }

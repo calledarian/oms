@@ -5,13 +5,7 @@ import { useEffect, useState } from "react";
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export function useProducts() {
-    const [formData, setFormData] = useState<Pick<Product, "name" | "description" | "price" | "images">>({
-        name: '',
-        description: '',
-        price: '',
-        images: [],
-    });
-
+    const [formData, setFormData] = useState<Partial<Product>>({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
     const [products, setProducts] = useState<Product[]>([]);
@@ -19,25 +13,7 @@ export function useProducts() {
     // handle input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
-
-    // create product
-    const createProducts = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await axios.post<Product>(`${BACKEND_URL}/products`, formData);
-            setProducts((prev) => [...prev, response.data]); // optional: add new product to state
-        } catch (err) {
-            setError(err as Error);
-        } finally {
-            setLoading(false);
-        }
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     // fetch products
@@ -48,39 +24,54 @@ export function useProducts() {
             const response = await axios.get<Product[]>(`${BACKEND_URL}/products`);
             setProducts(response.data);
         } catch (err: any) {
-            if (err.response?.data?.message) {
-                setError(new Error(err.response.data.message));
-            } else {
-                setError(err as Error);
-            }
-
+            setError(new Error(err.response?.data?.message || err.message));
         } finally {
             setLoading(false);
         }
     };
 
+    // create product
+    const createProducts = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            await axios.post<Product>(`${BACKEND_URL}/products`, formData);
+            setFormData({}); // optional: clear form
+            await fetchProducts(); // ✅ refetch after creation
+        } catch (err: any) {
+            setError(new Error(err.response?.data?.message || err.message));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // delete product
     const deleteProductById = async (id: number) => {
         setLoading(true);
         setError(null);
-
         try {
             await axios.delete(`${BACKEND_URL}/products/${id}`);
-            setProducts(prev => prev.filter(product => product.id !== id));
+            setProducts((prev) => prev.filter((product) => product.id !== id));
         } catch (err: any) {
-            if (err.response?.data?.message) {
-                setError(new Error(err.response.data.message));
-            } else {
-                setError(err as Error);
-            }
+            setError(new Error(err.response?.data?.message || err.message));
         } finally {
             setLoading(false);
         }
     };
-
 
     useEffect(() => {
         fetchProducts();
     }, []);
 
-    return { formData, handleChange, createProducts, loading, error, setProducts, products, deleteProductById };
+    return {
+        formData,
+        handleChange,
+        createProducts,
+        loading,
+        error,
+        setProducts,
+        products,
+        deleteProductById,
+        fetchProducts, // expose it too, in case UI needs manual refresh
+    };
 }

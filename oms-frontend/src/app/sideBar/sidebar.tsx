@@ -12,9 +12,9 @@ import Link from 'next/link';
 const drawerWidth = 240;
 const navItems = [
     { label: 'Dashboard', href: '/' },
-    { label: 'Order', href: '/orders' },
-    { label: 'Products', href: '/products' }, // Add new items here
-    { label: 'Customers', href: '/customers' }
+    { label: 'Orders', href: '/orders' },
+    { label: 'Create Order', href: '/orders/create-order' },
+    { label: 'Products', href: '/products' },
 ];
 
 export default function SideBar() {

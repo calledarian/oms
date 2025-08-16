@@ -37,6 +37,17 @@ export const columns: GridColDef[] = [
         ),
     },
     {
+        field: 'address',
+        headerName: 'Address',
+        width: 190,
+
+    },
+    {
+        field: 'phone',
+        headerName: 'Phone',
+        width: 150,
+    },
+    {
         field: 'createdAt',
         headerName: 'Order Date',
         width: 150,
