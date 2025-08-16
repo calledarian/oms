@@ -20,11 +20,21 @@ export class Order {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToMany(() => OrderItem, (orderItem) => orderItem.order, { cascade: true })
+    @OneToMany(() => OrderItem, orderItem => orderItem.order, {
+        cascade: true,
+        onDelete: 'CASCADE',
+    })
     orderItems: OrderItem[];
+
 
     @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
     totalAmount: number;
+
+    @Column()
+    address: string;
+
+    @Column()
+    phone: string;
 
     @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PENDING, })
     status: OrderStatus;

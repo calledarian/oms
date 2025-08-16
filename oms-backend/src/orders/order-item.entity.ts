@@ -1,6 +1,4 @@
-// src/orders/order-item.entity.ts
-
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Order } from './orders.entity';
 import { Product } from 'src/products/products.entity';
 
@@ -9,18 +7,28 @@ export class OrderItem {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column('int')
     quantity: number;
 
-    // Price of the product at the time the order was placed
-    @Column({ type: 'decimal', precision: 10, scale: 2 })
+    @Column('decimal', { precision: 10, scale: 2 })
     price: number;
 
-    // Relation to Order. An OrderItem belongs to one Order.
-    @ManyToOne(() => Order, (order) => order.orderItems)
+    @Column('decimal', { precision: 10, scale: 2 })
+    totalAmount: number; // subtotal for this item
+
+    // Relation to Order
+    @ManyToOne(() => Order, order => order.orderItems, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'orderId' })
     order: Order;
 
-    // Relation to Product. An OrderItem refers to one Product.
-    @ManyToOne(() => Product, (product) => product.orderItems)
+    @Column()
+    orderId: number;
+
+    // Relation to Product
+    @ManyToOne(() => Product, product => product.orderItems)
+    @JoinColumn({ name: 'productId' })
     product: Product;
+
+    @Column()
+    productId: number;
 }

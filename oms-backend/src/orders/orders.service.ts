@@ -1,9 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Order } from './orders.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Order } from './orders.entity';
 import { OrderItem } from './order-item.entity';
 import { Product } from 'src/products/products.entity';
+
+export class CreateOrderDto {
+    orderItems: { productId: number; quantity: number }[];
+    address: string;
+    phone: string;
+}
 
 @Injectable()
 export class OrdersService {
@@ -12,6 +18,8 @@ export class OrdersService {
         private ordersRepository: Repository<Order>,
         @InjectRepository(Product)
         private productsRepository: Repository<Product>,
+        @InjectRepository(OrderItem)
+        private orderItemsRepository: Repository<OrderItem>,
     ) { }
 
     findAll(): Promise<Order[]> {
@@ -28,28 +36,32 @@ export class OrdersService {
         });
     }
 
-    async create(data: { items: { productId: number; quantity: number }[] }): Promise<Order> {
-        if (!data.items?.length) throw new Error('Missing order items');
+    async create(dto: CreateOrderDto): Promise<Order> {
+        if (!dto.orderItems?.length) throw new Error('Missing order items');
+        if (!dto.address) throw new Error('Missing address');
+        if (!dto.phone) throw new Error('Missing phone');
 
-        const productIds = data.items.map(i => i.productId);
-        const products = await this.productsRepository.findByIds(productIds);
+        const orderItems = await Promise.all(
+            dto.orderItems.map(async (item) => {
+                const product = await this.productsRepository.findOne({ where: { id: item.productId } });
+                if (!product) throw new Error(`Product ${item.productId} not found`);
 
-        let totalAmount = 0;
-        const orderItems = data.items.map(item => {
-            const product = products.find(p => p.id === item.productId);
-            if (!product) throw new Error(`Product with ID ${item.productId} not found`);
+                return this.orderItemsRepository.create({
+                    product,
+                    productId: product.id,
+                    quantity: item.quantity,
+                    price: product.price,
+                    totalAmount: product.price * item.quantity,
+                });
+            })
+        );
 
-            const price = Number(product.price);
-            totalAmount += price * item.quantity;
-
-            return {
-                product,
-                quantity: item.quantity,
-                price, // must set price here!
-            } as OrderItem;
-        });
+        // ✅ Use item.totalAmount instead of order.totalAmount
+        const totalAmount = orderItems.reduce((sum, item) => sum + item.totalAmount, 0);
 
         const order = this.ordersRepository.create({
+            address: dto.address,
+            phone: dto.phone,
             orderItems,
             totalAmount,
         });
@@ -57,9 +69,7 @@ export class OrdersService {
         return this.ordersRepository.save(order);
     }
 
-
-
-    async remove(id: number): Promise<void> {
+    async delete(id: number): Promise<void> {
         if (!id) {
             throw new Error('Missing id');
         }

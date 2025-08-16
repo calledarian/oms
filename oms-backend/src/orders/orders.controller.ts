@@ -3,8 +3,11 @@ import { OrdersService } from './orders.service';
 import { Order } from './orders.entity';
 
 export class CreateOrderDto {
-    items: { productId: number; quantity: number }[];
+    address: string;
+    phone: string;
+    orderItems: { productId: number; quantity: number }[];
 }
+
 
 @Controller('/orders')
 export class OrdersController {
@@ -18,20 +21,25 @@ export class OrdersController {
 
     // GET /orders/:id
     @Get(':id')
-    findOne(@Param('id') id: string): Promise<Order | null> {
-        return this.ordersService.findOne(Number(id));
+    findOne(@Param('id') id: number): Promise<Order | null> {
+        return this.ordersService.findOne((id));
     }
 
-    // POST /orders
     @Post()
-    create(@Body() dto: CreateOrderDto) {
-        console.log('Received order request:', dto);
-        return this.ordersService.create(dto);
+    async create(@Body() dto: CreateOrderDto) {
+        try {
+            console.log('Received order request:', dto);
+            return await this.ordersService.create(dto);
+        } catch (err) {
+            console.error('Error creating order:', err.message);
+            throw new Error('Failed to create order: ' + err.message);
+        }
     }
+
 
     // DELETE /orders/:id
     @Delete(':id')
     remove(@Param('id') id: string): Promise<void> {
-        return this.ordersService.remove(Number(id));
+        return this.ordersService.delete(Number(id));
     }
 }
