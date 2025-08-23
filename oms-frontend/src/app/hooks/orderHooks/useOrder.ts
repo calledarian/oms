@@ -38,15 +38,15 @@ export function useOrders() {
     e: React.ChangeEvent<HTMLInputElement>,
     orderItemId: number,
   ) => {
-    const value = e.target.value;
-    const quantity = value === "" ? 0 : parseInt(value, 10);
+    let quantity = parseInt(e.target.value, 10);
+
+    // If not a number or less than 1, set to 1
+    if (isNaN(quantity) || quantity < 1) quantity = 1;
 
     setFormData((prev) => ({
       ...prev,
       orderItems: (prev.orderItems ?? []).map((item) =>
-        item.id === orderItemId
-          ? { ...item, quantity: isNaN(quantity) ? 0 : quantity }
-          : item,
+        item.id === orderItemId ? { ...item, quantity } : item,
       ),
     }));
   };
@@ -56,7 +56,7 @@ export function useOrders() {
     const selectedIds = event.target.value as number[];
     setSelectedProductIds(selectedIds);
 
-    // Keep existing items still selected
+    // Keep existing items that are still selected
     const updatedOrderItems = (formData.orderItems ?? []).filter((item) =>
       selectedIds.includes(item.product.id),
     );
@@ -102,6 +102,17 @@ export function useOrders() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const telegramOrders = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      await axios.post(`${BACKEND_URL}/orders/telegram`);
+    } catch (err) {
+      setError(err as Error);
+    }
+    setLoading(false);
   };
 
   const fetchArchivedOrders = async () => {
@@ -164,16 +175,16 @@ export function useOrders() {
   };
 
   const deleteOrderById = async (id: number) => {
-      setLoading(true);
-      setError(null);
-      try {
-          await axios.delete(`${BACKEND_URL}/orders/${id}`);
-          setRows((prev) => prev.filter((order : OrderRow) => order.id !== id));
-      } catch (err: any) {
-          setError(new Error(err.response?.data?.message || err.message));
-      } finally {
-          setLoading(false);
-      }
+    setLoading(true);
+    setError(null);
+    try {
+      await axios.delete(`${BACKEND_URL}/orders/${id}`);
+      setRows((prev) => prev.filter((order: OrderRow) => order.id !== id));
+    } catch (err: any) {
+      setError(new Error(err.response?.data?.message || err.message));
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -194,6 +205,7 @@ export function useOrders() {
     deleteOrderById,
     updateOrderStatus,
     fetchOrders,
+    telegramOrders,
     fetchArchivedOrders,
     calculateTotalAmount,
   };

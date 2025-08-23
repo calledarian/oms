@@ -45,7 +45,9 @@ export class TelegramService {
         // Retry only on network/DNS issues (EAI_AGAIN or FetchError)
         if (
           i < retries - 1 &&
-          (err.code === 'EAI_AGAIN' || err.type === 'system' || err.name === 'FetchError')
+          (err.code === 'EAI_AGAIN' ||
+            err.type === 'system' ||
+            err.name === 'FetchError')
         ) {
           await new Promise((r) => setTimeout(r, 1000));
           continue;
@@ -87,7 +89,8 @@ export class TelegramService {
   async notifyNewOrder(order: Order) {
     const itemsText = order.orderItems
       .map(
-        (item) => `${item.product.name} x ${item.quantity} = $${item.totalAmount}`
+        (item) =>
+          `${item.product.name} x ${item.quantity} = $${item.totalAmount}`,
       )
       .join('\n');
 
@@ -101,5 +104,32 @@ ${itemsText}
     `;
 
     await this.sendMessage(message);
+  }
+
+  async notifyOrders(orders: Order[]) {
+    if (!orders.length) {
+      await this.sendMessage('No active orders found.');
+      return;
+    }
+
+    const allOrdersText = orders
+      .map((order) => {
+        const itemsText = order.orderItems
+          .map((item) => `${item.product.name} x${item.quantity}`)
+          .join('\n');
+
+        return `
+  📦 <b>Order #${order.id}</b>
+  👤 <b>Status:</b> ${this.getStatusLabel(order.status)}
+  📱 <b>Phone:</b> ${order.phone}
+  🏠 <b>Address:</b> ${order.address}
+  🛒 <b>Items:</b>
+  ${itemsText}
+  💰 <b>Total:</b> $${order.totalAmount}
+        `;
+      })
+      .join('\n-----------------\n'); // separator between orders
+
+    await this.sendMessage(allOrdersText);
   }
 }

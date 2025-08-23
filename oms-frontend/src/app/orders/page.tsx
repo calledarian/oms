@@ -5,16 +5,15 @@ import { useOrders } from "../hooks/orderHooks/useOrder";
 import OrdersTable from "./_partials/OrdersTable";
 
 export default function Orders() {
-  const orderState = useOrders();
-  const telegramOrders = useOrders;
+  const { rows, loading, error, telegramOrders } = useOrders();
   return (
     <div>
-      <OrdersTable
-        loading={orderState.loading}
-        error={orderState.error}
-        rows={orderState.rows}
-      />
-      <Button fullWidth startIcon={<TelegramIcon />} onClick={telegramOrders}>
+      <OrdersTable loading={loading} error={error} rows={rows} />
+      <Button
+        fullWidth
+        startIcon={<TelegramIcon />}
+        onClick={() => telegramOrders()}
+      >
         SEND
       </Button>
     </div>
